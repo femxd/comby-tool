@@ -1,0 +1,25 @@
+{
+  "name": "comby-tool",
+  "version": "1.0.0",
+  "description": "comby tool",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/femxd/comby-tool.git"
+  },
+  "keywords": [
+    "comby",
+    "component",
+    "library",
+    "tool"
+  ],
+  "author": "damonpfliu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/femxd/comby-tool/issues"
+  },
+  "homepage": "https://github.com/femxd/comby-tool#readme"
+}
