@@ -11,10 +11,11 @@ program
   .alias('i')
   .description('创建项目')
   .option('--name [name]')
-  .option('--name [name]')
+  .option('--librarie [librarie]')
   .action(option => {
     var config = _.assign({
       name: null,
+      developer: '',
       librarie: ''
     }, option)
     var promps = []
@@ -32,7 +33,21 @@ program
         }
       })
     }
-    if(!config.librarieName) {
+    //开发者
+    if(!config.developer) {
+      promps.push({
+        type: 'input',
+        name: 'developer',
+        message: '请输入开发者名称(须与RTX名一致)',
+        validate: function (input){
+          if(!input) {
+            return '不能为空'
+          }
+          return true
+        }
+      })
+    }
+    if(!config.librarie) {
       promps.push({
         type: 'input',
         name: 'librarie',
@@ -41,7 +56,7 @@ program
     }
     inquirer.prompt(promps).then(function (answer) {
       config = _.assign(config, answer)
-      console.log('answer:', answer)
+      // console.log('answer:', answer)
       //生成组件样式js文件
       try {
         let exists = fs.existsSync('./'+config.name)
@@ -56,6 +71,7 @@ program
             funMkdirSync('./'+config.name+'/libraries/'+config.librarie)
           }
           baseConfig = baseConfig.replace(/\{__librarieName__\}/, config.librarie)
+          baseConfig = baseConfig.replace(/\{__developer__\}/, config.developer)
           fs.writeFileSync('./'+config.name+'/baseConfig.js', baseConfig)
           console.info(config.name+'项目正常生成')
         }
@@ -67,15 +83,14 @@ program
   .on('--help', function() {
     console.log('  Examples:')
     console.log('')
-    console.log('$ comby init projectName')
-    console.log('$ comby i projectName')
+    console.log('$ comby init name')
+    console.log('$ comby i name')
   })
 
 program
   .command('module')
   .alias('m')
   .description('创建新的组件')
-  .option('--path [path]')
   .option('--name [name]')
   .action(option => {
     const projectPath = process.cwd().replace(/\\/g, '/')
@@ -85,7 +100,7 @@ program
       if(exists) {
         baseConfig = require(projectPath + '/baseConfig.js')
         if (!baseConfig.librarieName) {
-          console.info('请在baseConfig.js中配置需要组件库的名称')
+          console.info('请在baseConfig.js中配置添加组件的组件库的名称(文件夹名)')
           return false
         }
         baseConfig.projectPath = projectPath
@@ -162,13 +177,8 @@ program
       promps.push({
         type: 'input',
         name: 'developer',
-        message: '请输入组件开发者(多人用半角分号;隔开)',
-        validate: function (input){
-          if(!input) {
-            return '不能为空'
-          }
-          return true
-        }
+        default: baseConfig.developer,
+        message: '请输入组件开发者(多人用半角分号;隔开)'
       })
     }
     //组件设计师
@@ -176,13 +186,8 @@ program
       promps.push({
         type: 'input',
         name: 'designer',
-        message: '请输入组件设计师(多人用半角分号;隔开)',
-        validate: function (input){
-          if(!input) {
-            return '不能为空'
-          }
-          return true
-        }
+        default: 'someone',
+        message: '请输入组件设计师(多人用半角分号;隔开)'
       })
     }
     //组件描述
@@ -190,13 +195,8 @@ program
       promps.push({
         type: 'input',
         name: 'description',
-        message: '请输入组件描述',
-        validate: function (input){
-          if(!input) {
-            return '不能为空'
-          }
-          return true
-        }
+        default: '请填写组件描述',
+        message: '请输入组件描述'
       })
     }
     //组件应用场景
@@ -204,13 +204,8 @@ program
       promps.push({
         type: 'input',
         name: 'scene',
-        message: '请输入组件使用场景',
-        validate: function (input){
-          if(!input) {
-            return '不能为空'
-          }
-          return true
-        }
+        default: '请填写组件使用场景',
+        message: '请输入组件使用场景'
       })
     }
     //组件是否是无状态组件
@@ -255,7 +250,7 @@ program
           config.designer += `\n  - ${arrDesigner[i]}`
         }
       }
-      console.log(config)
+      // console.log(config)
       //生成组件目录结构
       funMkdirSync(baseConfig.librariePath+'/'+config.folderName+'/style')
       funMkdirSync(baseConfig.librariePath+'/'+config.folderName+'/demo')
@@ -340,6 +335,8 @@ program
     console.log('$ app module moduleName')
     console.log('$ app m moduleName')
   })
+
+
 program.parse(process.argv)
 
 
