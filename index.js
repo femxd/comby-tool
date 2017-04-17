@@ -59,12 +59,12 @@ program
       // console.log('answer:', answer)
       //生成组件样式js文件
       try {
-        let exists = fs.existsSync('./'+config.name)
+        let exists = fsExistsSync('./'+config.name)
         if(exists) {
           console.error(config.name+'生成失败,项目已存在')
         } else {
           funMkdirSync('./'+config.name+'/libraries')
-          var baseConfig = fs.readFileSync(path.resolve(__dirname, './tpl/baseConfig.js'))
+          var baseConfig = fs.readFileSync(path.resolve(__dirname, './tpl/comby.config.js'))
           baseConfig = String(baseConfig)
 
           if (!!config.librarie) {
@@ -72,7 +72,7 @@ program
           }
           baseConfig = baseConfig.replace(/\{__librarieName__\}/, config.librarie)
           baseConfig = baseConfig.replace(/\{__developer__\}/, config.developer)
-          fs.writeFileSync('./'+config.name+'/baseConfig.js', baseConfig)
+          fs.writeFileSync('./'+config.name+'/comby.config.js', baseConfig)
           console.info(config.name+'项目正常生成')
         }
       } catch(e) {
@@ -88,29 +88,19 @@ program
   })
 
 program
-  .command('module')
-  .alias('m')
+  .command('component')
+  .alias('c')
   .description('创建新的组件')
   .option('--name [name]')
   .action(option => {
-    const projectPath = process.cwd().replace(/\\/g, '/')
-    var baseConfig
-    try {
-      let exists = fs.existsSync('./baseConfig.js')
-      if(exists) {
-        baseConfig = require(projectPath + '/baseConfig.js')
-        if (!baseConfig.librarieName) {
-          console.info('请在baseConfig.js中配置添加组件的组件库的名称(文件夹名)')
-          return false
-        }
-        baseConfig.projectPath = projectPath
-        baseConfig.librariePath = baseConfig.projectPath + '/libraries/' + baseConfig.librarieName
-      } else {
-        console.info('请在项目内执行此操作')
-        return false
-      }
-    } catch(e) {
-      console.error('Error 创建新的组件: ' + e)
+    var baseConfig = {
+      projectPath: process.cwd().replace(/\\/g, '/')
+    }
+    baseConfig.librariePath = baseConfig.projectPath + '/components'
+    let exists = fsExistsSync('./components', fs.constants.F_OK)
+    if(!exists) {
+      console.info('请在项目内执行此操作')
+      return false
     }
     var config = _.assign({
       name: null,
@@ -177,7 +167,8 @@ program
       promps.push({
         type: 'input',
         name: 'developer',
-        default: baseConfig.developer,
+        // default: baseConfig.developer,
+        default: 'someone(某人)',
         message: '请输入组件开发者(多人用半角分号;隔开)'
       })
     }
@@ -186,7 +177,7 @@ program
       promps.push({
         type: 'input',
         name: 'designer',
-        default: 'someone',
+        default: 'someone(某人)',
         message: '请输入组件设计师(多人用半角分号;隔开)'
       })
     }
@@ -266,86 +257,95 @@ program
       demo = String(demo)
       //生成组件js文件
       try {
-        let exists = fs.existsSync(baseConfig.librariePath+'/'+config.name+'/index.js')
+        let exists = fsExistsSync(baseConfig.librariePath+'/'+config.folderName+'/index.js')
         if(exists) {
-          console.info(config.name+'/index.js已存在')
+          console.info(config.folderName+'/index.js已存在')
         } else {
           componentJs = componentJs.replace(/\{__name__\}/g, config.name).replace(/\{__className__\}/, config.className).replace(/\{__title__\}/, config.title)
-          fs.writeFileSync(baseConfig.librariePath+'/'+config.name+'/index.js', componentJs)
-          console.info(config.name+'/index.js正常生成')
+          fs.writeFileSync(baseConfig.librariePath+'/'+config.folderName+'/index.js', componentJs)
+          console.info(config.folderName+'/index.js正常生成')
         }
       } catch(e) {
-        console.error('Error ' + config.name + '/index.js: ' + e)
+        console.error('Error ' + config.folderName + '/index.js: ' + e)
       }
       //生成组件md描述文件
       try {
-        let exists = fs.existsSync(baseConfig.librariePath+'/'+config.name+'/index.md')
+        let exists = fsExistsSync(baseConfig.librariePath+'/'+config.folderName+'/index.md')
         if(exists) {
-          console.info(config.name+'/index.md已存在')
+          console.info(config.folderName+'/index.md已存在')
         } else {
           componentMd = componentMd.replace(/\{__category__\}/, config.category).replace(/\{__title__\}/, config.title).replace(/\{__developer__\}/, config.developer).replace(/\{__designer__\}/, config.designer).replace(/\{__description__\}/, config.description).replace(/\{__scene__\}/, config.scene)
-          fs.writeFileSync(baseConfig.librariePath+'/'+config.name+'/index.md', componentMd)
-          console.info(config.name+'/index.md正常生成')
+          fs.writeFileSync(baseConfig.librariePath+'/'+config.folderName+'/index.md', componentMd)
+          console.info(config.folderName+'/index.md正常生成')
         }
       } catch(e) {
-        console.error('Error ' + config.name + '/index.md: ' + e)
+        console.error('Error ' + config.folderName + '/index.md: ' + e)
       }
       //生成组件样式js文件
       try {
-        let exists = fs.existsSync(baseConfig.librariePath+'/'+config.name+'/style/index.js')
+        let exists = fsExistsSync(baseConfig.librariePath+'/'+config.folderName+'/style/index.js')
         if(exists) {
-          console.info(config.name+'/style/index.js已存在')
+          console.info(config.folderName+'/style/index.js已存在')
         } else {
-          fs.writeFileSync(baseConfig.librariePath+'/'+config.name+'/style/index.js', styleJs)
-          console.info(config.name+'/style/index.js正常生成')
+          fs.writeFileSync(baseConfig.librariePath+'/'+config.folderName+'/style/index.js', styleJs)
+          console.info(config.folderName+'/style/index.js正常生成')
         }
       } catch(e) {
-        console.error('Error ' + config.name + '/style/index.js: ' + e)
+        console.error('Error ' + config.folderName + '/style/index.js: ' + e)
       }
       //生成组件样式scss文件
       try {
-        let exists = fs.existsSync(baseConfig.librariePath+'/'+config.name+'/style/index.scss')
+        let exists = fsExistsSync(baseConfig.librariePath+'/'+config.folderName+'/style/index.scss')
         if(exists) {
-          console.info(config.name+'/style/index.scss已存在')
+          console.info(config.folderName+'/style/index.scss已存在')
         } else {
-          fs.writeFileSync(baseConfig.librariePath+'/'+config.name+'/style/index.scss', styleScss)
-          console.info(config.name+'/style/index.scss正常生成')
+          fs.writeFileSync(baseConfig.librariePath+'/'+config.folderName+'/style/index.scss', styleScss)
+          console.info(config.folderName+'/style/index.scss正常生成')
         }
       } catch(e) {
-        console.error('Error ' + config.name + '/style/index.scss: ' + e)
+        console.error('Error ' + config.folderName + '/style/index.scss: ' + e)
       }
       //生成组件示例demo.md
       try {
-        var exists = fs.existsSync(baseConfig.librariePath+'/'+config.name+'/demo/demo.md')
+        var exists = fsExistsSync(baseConfig.librariePath+'/'+config.folderName+'/demo/demo.md')
         if(exists) {
-          console.info(config.name+'/demo/demo.md已存在')
+          console.info(config.folderName+'/demo/demo.md已存在')
         } else {
           demo = demo.replace(/\{__name__\}/g, config.name)
-          fs.writeFileSync(baseConfig.librariePath+'/'+config.name+'/demo/demo.md', demo)
-          console.info(config.name+'/demo/demo.md正常生成')
+          fs.writeFileSync(baseConfig.librariePath+'/'+config.folderName+'/demo/demo.md', demo)
+          console.info(config.folderName+'/demo/demo.md正常生成')
         }
       } catch(e) {
-        console.error('Error ' + config.name + '/demo/demo.md: ' + e)
+        console.error('Error ' + config.folderName + '/demo/demo.md: ' + e)
       }
     })
   })
   .on('--help', function() {
     console.log('  Examples:')
     console.log('')
-    console.log('$ app module moduleName')
-    console.log('$ app m moduleName')
+    console.log('$ app component componentName')
+    console.log('$ app c componentName')
   })
 
 
 program.parse(process.argv)
 
 
+//检测文件或者文件夹存在 nodeJS
+function fsExistsSync(path) {
+    try{
+        fs.accessSync(path, fs.F_OK);
+    }catch(e){
+        return false;
+    }
+    return true;
+}
 
 //使用时第二个参数可以忽略  
 function funMkdirSync(dirpath,dirname){
   //判断是否是第一次调用  
   if(typeof dirname === "undefined"){
-    if(fs.existsSync(dirpath)){
+    if(fsExistsSync(dirpath)){
       return;
     }else{
       funMkdirSync(dirpath,path.dirname(dirpath));
@@ -356,7 +356,7 @@ function funMkdirSync(dirpath,dirname){
       funMkdirSync(dirpath);
       return;
     }
-    if(fs.existsSync(dirname)){
+    if(fsExistsSync(dirname)){
       fs.mkdirSync(dirpath)
     }else{
       funMkdirSync(dirname,path.dirname(dirname));
