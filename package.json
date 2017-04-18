@@ -1,6 +1,6 @@
 {
   "name": "comby-tool",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "comby tool",
   "main": "index.js",
   "bin": {

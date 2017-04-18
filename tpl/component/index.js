@@ -1,7 +1,7 @@
-import { Component } from 'react';
+import React from 'react';
 import classnames from 'classnames';
 
-class {__name__} extends Component {
+class {__name__} extends React.Component {
 
   constructor(props) {
     super(props);
